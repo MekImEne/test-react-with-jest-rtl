@@ -12,12 +12,16 @@ afterEach(() => {
   jest.restoreAllMocks()
 });
 
+//A warning act(..) is thrown because the state is set after the test block finishes rendering the component.
 
-test("initial render in the landing page", () => {
+// async tells Jest that asynchronous code runs as a result of the API call that occurs when the component mounts.
+test("initial render in the landing page", async () => {
   render(<App />);
 
   expect(screen.getByRole("heading")).toHaveTextContent(/Doggy Directory/);
   expect(screen.getByRole("combobox")).toHaveDisplayValue("Select a breed");
+  //fix the warning
+  expect(await screen.findByRole("option", { name: "husky"})).toBeInTheDocument();
   expect(screen.getByRole("button", { name: "Search" })).toBeDisabled();
   expect(screen.getByRole("img")).toBeInTheDocument();
 });
