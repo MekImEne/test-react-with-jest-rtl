@@ -1,4 +1,5 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitForElementToBeRemoved } from "@testing-library/react";
+import userEvent from '@testing-library/user-event'; 
 import mockFetch from "./mocks/mockFetch";
 import App from "./App";
 
@@ -25,3 +26,36 @@ test("initial render in the landing page", async () => {
   expect(screen.getByRole("button", { name: "Search" })).toBeDisabled();
   expect(screen.getByRole("img")).toBeInTheDocument();
 });
+
+
+test("should be able to search and display dog image results", async () => {
+  render(<App />);
+  
+  
+  //Simulate selecting an option and verifying its value
+  const select = screen.getByRole("combobox");
+  // wait for the cattledog option to appear in the document before proceeding with further assertions.
+   expect(await screen.findByRole("option", { name: "cattledog"})).toBeInTheDocument();
+   userEvent.selectOptions(select, "cattledog");
+  expect(select).toHaveValue("cattledog");
+  
+
+  //Simulate initiating the search request
+   const searchBtn = screen.getByRole("button", { name: "Search" });
+   expect(searchBtn).not.toBeDisabled(); //jest-dom matcher will verify that the search button is not disabled when a breed selection is made.
+  userEvent.click(searchBtn); //simulates clicking the search button.
+  
+
+  //Loading state displays and gets removed once results are displayed
+  //async helper function imported earlier will wait for the appearance and disappearance of the 
+  //Loading message while the search API call is in flight. 
+   await waitForElementToBeRemoved(() => screen.queryByText(/Loading/i)); // it checks for the absence of an element without throwing an error.
+
+  
+  //Verify image display and results count
+   const dogImages = screen.getAllByRole("img");
+   expect(dogImages).toHaveLength(2); // matcher to verify that there are two images displayed.
+   expect(screen.getByText(/2 Results/i)).toBeInTheDocument();
+   expect(dogImages[0]).toHaveAccessibleName("cattledog 1 of 2"); // to check alt text
+   expect(dogImages[1]).toHaveAccessibleName("cattledog 2 of 2");
+})
