@@ -15,16 +15,17 @@ afterEach(() => {
 
 //A warning act(..) is thrown because the state is set after the test block finishes rendering the component.
 
-// async tells Jest that asynchronous code runs as a result of the API call that occurs when the component mounts.
+// async tells Jest that asynchronous code runs as a result of the API call that occurs 
+//when the component mounts.
 test("initial render in the landing page", async () => {
   render(<App />);
 
-  expect(screen.getByRole("heading")).toHaveTextContent(/Doggy Directory/);
-  expect(screen.getByRole("combobox")).toHaveDisplayValue("Select a breed");
+  expect(screen.getByRole("heading")).toHaveTextContent(/Doggy Directory/); //expect the element with the heading role to have a substring match of Doggy Directory.
+  expect(screen.getByRole("combobox")).toHaveDisplayValue("Select a breed"); //expect the select input to have an exact display value of Select a breed.
   //fix the warning
-  expect(await screen.findByRole("option", { name: "husky"})).toBeInTheDocument();
-  expect(screen.getByRole("button", { name: "Search" })).toBeDisabled();
-  expect(screen.getByRole("img")).toBeInTheDocument();
+  expect(await screen.findByRole("option", { name: "husky"})).toBeInTheDocument(); // to test asynchronous code
+  expect(screen.getByRole("button", { name: "Search" })).toBeDisabled(); //expect the Search button to be disabled since a selection has not been made.
+  expect(screen.getByRole("img")).toBeInTheDocument(); //expect the placeholder image to be present in the document since a search has not taken place.
 });
 
 
@@ -42,14 +43,17 @@ test("should be able to search and display dog image results", async () => {
 
   //Simulate initiating the search request
    const searchBtn = screen.getByRole("button", { name: "Search" });
-   expect(searchBtn).not.toBeDisabled(); //jest-dom matcher will verify that the search button is not disabled when a breed selection is made.
+  expect(searchBtn).not.toBeDisabled();
+  //jest-dom matcher will verify that the search
+  //button is not disabled when a breed selection is made.
   userEvent.click(searchBtn); //simulates clicking the search button.
   
 
   //Loading state displays and gets removed once results are displayed
   //async helper function imported earlier will wait for the appearance and disappearance of the 
   //Loading message while the search API call is in flight. 
-   await waitForElementToBeRemoved(() => screen.queryByText(/Loading/i)); // it checks for the absence of an element without throwing an error.
+  await waitForElementToBeRemoved(() => screen.queryByText(/Loading/i));
+   // it checks for the absence of an element without throwing an error.
 
   
   //Verify image display and results count
